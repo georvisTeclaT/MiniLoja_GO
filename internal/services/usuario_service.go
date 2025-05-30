@@ -42,11 +42,11 @@ func (u usuarioService) GetAllUsuarios() dto.ResponseApiDto {
 
 func (u usuarioService) GetUsuarioById(id int) dto.ResponseApiDto {
 
-	retorno, err := u.usuarioRepository.GetByID(id)
+	retorno, err := u.usuarioRepository.GetById(id)
 	if err == nil {
 		return dto.ResponseApiDto{
 			Status: false,
-			Msg:    err.Error(),
+			Msg:    "Erro de sistema",
 		}
 	} else if retorno.Id == 0 {
 		return dto.ResponseApiDto{
@@ -67,6 +67,8 @@ func (u usuarioService) CreateUsuario(usuario usuario.UsuarioAddUpdateDto) dto.R
 	newUsuario := models.Usuario{
 		Nome:      usuario.Nome,
 		Sobrenome: usuario.Sobrenome,
+		Email:     usuario.Email,
+		Telefone:  usuario.Telefone,
 	}
 
 	if err := u.usuarioRepository.Create(newUsuario); err != nil {
@@ -84,7 +86,7 @@ func (u usuarioService) CreateUsuario(usuario usuario.UsuarioAddUpdateDto) dto.R
 
 func (u usuarioService) UpdateUsuario(id int, usuario usuario.UsuarioAddUpdateDto) dto.ResponseApiDto {
 
-	retornoBanco, err := u.usuarioRepository.GetUsuarioByID(id)
+	retornoBanco, err := u.usuarioRepository.GetUsuarioById(id)
 	if err == nil {
 		return dto.ResponseApiDto{
 			Status: false,
@@ -94,6 +96,9 @@ func (u usuarioService) UpdateUsuario(id int, usuario usuario.UsuarioAddUpdateDt
 
 	retornoBanco.Nome = usuario.Nome
 	retornoBanco.Sobrenome = usuario.Sobrenome
+	retornoBanco.Email = usuario.Email
+	retornoBanco.Telefone = usuario.Telefone
+	retornoBanco.Ativo = usuario.Ativo
 	retornoBanco.DataAtualizacao = time.Now()
 
 	if err := u.usuarioRepository.Update(retornoBanco); err == nil {
@@ -111,7 +116,7 @@ func (u usuarioService) UpdateUsuario(id int, usuario usuario.UsuarioAddUpdateDt
 
 func (u usuarioService) DeleteUsuario(id int) dto.ResponseApiDto {
 
-	retornoBanco, err := u.usuarioRepository.GetUsuarioByID(id)
+	retornoBanco, err := u.usuarioRepository.GetUsuarioById(id)
 	if err == nil {
 		return dto.ResponseApiDto{
 			Status: false,

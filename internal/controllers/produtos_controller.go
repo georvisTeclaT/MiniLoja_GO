@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"mini-loja/internal/dto"
-	"mini-loja/internal/dto/usuario"
+	"mini-loja/internal/dto/produto"
 	"mini-loja/internal/services/interfaces"
 	"net/http"
 	"strconv"
@@ -10,53 +10,46 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type UsuariosController struct {
-	usuarioService interfaces.IUsuarioService
+type ProdutosController struct {
+	produtoService interfaces.IProdutoService
 }
 
-func NewUsuarioController(s interfaces.IUsuarioService) *UsuariosController {
-	return &UsuariosController{s}
+func NewProdutoController(s interfaces.IProdutoService) *ProdutosController {
+	return &ProdutosController{s}
 }
 
-func (u UsuariosController) GetAllUsuarios(ctx *gin.Context) {
+func (p ProdutosController) GetAllProdutos(ctx *gin.Context) {
 
-	products := u.usuarioService.GetAllUsuarios()
+	produtos := p.produtoService.GetAllProdutos()
 
-	ctx.JSON(http.StatusOK, products)
+	ctx.JSON(http.StatusOK, produtos)
 }
 
-func (u UsuariosController) GetUsuarioById(ctx *gin.Context) {
+func (c ProdutosController) GetProdutoById(ctx *gin.Context) {
 
 	idParam := ctx.Param("id")
 
-	idUsuario, err := strconv.Atoi(idParam)
+	idProduto, err := strconv.Atoi(idParam)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "ID inválido"})
 		return
 	}
 
-	usuario := u.usuarioService.GetUsuarioById(idUsuario)
+	produto := c.produtoService.GetProdutoById(idProduto)
 
-	ctx.JSON(http.StatusOK, usuario)
+	ctx.JSON(http.StatusOK, produto)
 }
 
-func (u UsuariosController) CreateUsuario(ctx *gin.Context) {
+func (p ProdutosController) CreateProduto(ctx *gin.Context) {
 
-	var input usuario.UsuarioAddUpdateDto
+	var input produto.ProdutoAddUpdateDto
 
 	if err := ctx.ShouldBindJSON(&input); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Dados inválidos: " + err.Error()})
 		return
 	}
 
-	newUsuario := usuario.UsuarioAddUpdateDto{
-		Nome:      input.Nome,
-		Sobrenome: input.Sobrenome,
-		Email:     input.Email,
-		Telefone:  input.Telefone,
-	}
-
-	if input.Nome == "" || input.Sobrenome == "" || input.Email == "" || input.Telefone == "" {
+	if input.Nome == "" || input.Descricao == "" || input.Stock <= 0 || input.Preco <= 0 {
 		retorno := dto.ResponseApiDto{
 			Status: false,
 			Msg:    "Objeto inválido",
@@ -65,7 +58,14 @@ func (u UsuariosController) CreateUsuario(ctx *gin.Context) {
 		return
 	}
 
-	retornoAddServices := u.usuarioService.CreateUsuario(newUsuario)
+	newProduto := produto.ProdutoAddUpdateDto{
+		Nome:      input.Nome,
+		Descricao: input.Descricao,
+		Stock:     input.Stock,
+		Preco:     input.Preco,
+	}
+
+	retornoAddServices := p.produtoService.CreateProduto(newProduto)
 	if !retornoAddServices.Status {
 		ctx.JSON(http.StatusBadRequest, retornoAddServices)
 		return
@@ -74,22 +74,22 @@ func (u UsuariosController) CreateUsuario(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, retornoAddServices)
 }
 
-func (u UsuariosController) UpdateUsuario(ctx *gin.Context) {
+func (p ProdutosController) UpdateProduto(ctx *gin.Context) {
 
 	idParam := ctx.Param("id")
-	idUsuario, err := strconv.Atoi(idParam)
+	idProduto, err := strconv.Atoi(idParam)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "ID inválido"})
 		return
 	}
 
-	var input usuario.UsuarioAddUpdateDto
+	var input produto.ProdutoAddUpdateDto
 	if err := ctx.ShouldBindJSON(&input); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Dados inválidos: " + err.Error()})
 		return
 	}
 
-	if input.Nome == "" || input.Sobrenome == "" || input.Email == "" || input.Telefone == "" {
+	if input.Nome == "" || input.Descricao == "" || input.Stock <= 0 || input.Preco <= 0 {
 		retorno := dto.ResponseApiDto{
 			Status: false,
 			Msg:    "Objeto inválido",
@@ -98,15 +98,14 @@ func (u UsuariosController) UpdateUsuario(ctx *gin.Context) {
 		return
 	}
 
-	updateUsuario := usuario.UsuarioAddUpdateDto{
+	updateProduto := produto.ProdutoAddUpdateDto{
 		Nome:      input.Nome,
-		Sobrenome: input.Sobrenome,
-		Email:     input.Email,
-		Telefone:  input.Telefone,
-		Ativo:     input.Ativo,
+		Descricao: input.Descricao,
+		Stock:     input.Stock,
+		Preco:     input.Preco,
 	}
 
-	retornoUpdateServices := u.usuarioService.UpdateUsuario(idUsuario, updateUsuario)
+	retornoUpdateServices := p.produtoService.UpdateProduto(idProduto, updateProduto)
 	if !retornoUpdateServices.Status {
 		ctx.JSON(http.StatusBadRequest, retornoUpdateServices)
 		return
@@ -115,16 +114,16 @@ func (u UsuariosController) UpdateUsuario(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, retornoUpdateServices)
 }
 
-func (u UsuariosController) DeleteUsuario(ctx *gin.Context) {
+func (p ProdutosController) DeleteProduto(ctx *gin.Context) {
 
 	idParam := ctx.Param("id")
-	idUsuario, err := strconv.Atoi(idParam)
+	idProduto, err := strconv.Atoi(idParam)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "ID inválido"})
 		return
 	}
 
-	retornoDeleteServices := u.usuarioService.DeleteUsuario(idUsuario)
+	retornoDeleteServices := p.produtoService.DeleteProduto(idProduto)
 	if !retornoDeleteServices.Status {
 		ctx.JSON(http.StatusBadRequest, retornoDeleteServices)
 		return

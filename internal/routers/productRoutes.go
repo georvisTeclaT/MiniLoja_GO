@@ -9,18 +9,19 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func productRoutes(router *gin.Engine, db *sql.DB) {
-	productRepository := repositories.NewProductRepository(db)
-	productService := services.NewProductService(productRepository)
-	productController := controllers.NewProductController(productService)
+func produtoRoutes(router *gin.Engine, db *sql.DB) {
 
-	productRoutes := router.Group("/product")
+	produtoRepository := repositories.NewProdutoRepository(db)
+	produtoService := services.NewProdutoService(produtoRepository)
+	produtoController := controllers.NewProdutoController(produtoService)
+
+	produtoRoutes := router.Group("/produto")
 	{
-		productRoutes.GET("/allProducts", productController.GetAllProducts)
-		productRoutes.GET("/productById/:id", productController.GetProductById)
+		produtoRoutes.GET("/allProdutos", produtoController.GetAllProdutos)
+		produtoRoutes.GET("/produtoById/:id", produtoController.GetProdutoById)
 
-		productRoutes.POST("/productAdd", productController.CreateProduct)
-		productRoutes.PUT("/productUpdate/:id", productController.UpdateProduct)
-		productRoutes.DELETE("/productDelete/:id", productController.DeleteProduct)
+		produtoRoutes.POST("/produtoAdd", produtoController.CreateProduto)
+		produtoRoutes.PUT("/produtoUpdate/:id", produtoController.UpdateProduto)
+		produtoRoutes.DELETE("/produtoDelete/:id", produtoController.DeleteProduto)
 	}
 }

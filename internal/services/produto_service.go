@@ -2,22 +2,23 @@ package services
 
 import (
 	"mini-loja/internal/dto"
-	"mini-loja/internal/dto/product"
+	"mini-loja/internal/dto/produto"
 	"mini-loja/internal/models"
 	"mini-loja/internal/repositories/interfaces"
+	"time"
 )
 
-type productService struct {
-	productRepository interfaces.IProductRepository
+type produtoService struct {
+	productRepository interfaces.IProdutoRepository
 }
 
-func NewProductService(repo interfaces.IProductRepository) productService {
-	return productService{
+func NewProdutoService(repo interfaces.IProdutoRepository) produtoService {
+	return produtoService{
 		productRepository: repo,
 	}
 }
 
-func (p productService) GetAllProducts() dto.ResponseApiDto {
+func (p produtoService) GetAllProdutos() dto.ResponseApiDto {
 
 	retorno, err := p.productRepository.GetAll()
 	if err != nil {
@@ -40,13 +41,13 @@ func (p productService) GetAllProducts() dto.ResponseApiDto {
 
 }
 
-func (p productService) GetProductById(id int) dto.ResponseApiDto {
+func (p produtoService) GetProdutoById(id int) dto.ResponseApiDto {
 
 	retorno, err := p.productRepository.GetByID(id)
 	if err == nil {
 		return dto.ResponseApiDto{
 			Status: false,
-			Msg:    err.Error(),
+			Msg:    "Erro de sistema",
 		}
 	} else if retorno.Id == 0 {
 		return dto.ResponseApiDto{
@@ -63,14 +64,16 @@ func (p productService) GetProductById(id int) dto.ResponseApiDto {
 
 }
 
-func (p productService) CreateProduct(prod product.ProductAddUpdateDto) dto.ResponseApiDto {
+func (p produtoService) CreateProduto(prod produto.ProdutoAddUpdateDto) dto.ResponseApiDto {
 
-	newProduct := models.Product{
-		Name:  prod.Name,
-		Price: prod.Price,
+	newProduto := models.Produto{
+		Nome:      prod.Nome,
+		Descricao: prod.Descricao,
+		Stock:     prod.Stock,
+		Preco:     prod.Preco,
 	}
 
-	if err := p.productRepository.Create(newProduct); err != nil {
+	if err := p.productRepository.Create(newProduto); err != nil {
 		return dto.ResponseApiDto{
 			Status: false,
 			Msg:    "Erro ao inserir o produto no banco de dados",
@@ -83,18 +86,21 @@ func (p productService) CreateProduct(prod product.ProductAddUpdateDto) dto.Resp
 	}
 }
 
-func (p productService) UpdateProduct(id int, prod product.ProductAddUpdateDto) dto.ResponseApiDto {
+func (p produtoService) UpdateProduto(id int, prod produto.ProdutoAddUpdateDto) dto.ResponseApiDto {
 
-	retornoBanco, err := p.productRepository.GetProductByID(id)
-	if err == nil {
+	retornoBanco, err := p.productRepository.GetProdutoById(id)
+	if err == nil || retornoBanco.Id <= 0 {
 		return dto.ResponseApiDto{
 			Status: false,
 			Msg:    "Produto não encontrado",
 		}
 	}
 
-	retornoBanco.Name = prod.Name
-	retornoBanco.Price = prod.Price
+	retornoBanco.Nome = prod.Nome
+	retornoBanco.Descricao = prod.Descricao
+	retornoBanco.Stock = prod.Stock
+	retornoBanco.Preco = prod.Preco
+	retornoBanco.DataAtualizacao = time.Now()
 
 	if err := p.productRepository.Update(retornoBanco); err == nil {
 		return dto.ResponseApiDto{
@@ -109,10 +115,10 @@ func (p productService) UpdateProduct(id int, prod product.ProductAddUpdateDto) 
 	}
 }
 
-func (p productService) DeleteProduct(id int) dto.ResponseApiDto {
+func (p produtoService) DeleteProduto(id int) dto.ResponseApiDto {
 
-	retornoBanco, err := p.productRepository.GetProductByID(id)
-	if err == nil {
+	retornoBanco, err := p.productRepository.GetProdutoById(id)
+	if err == nil || retornoBanco.Id <= 0 {
 		return dto.ResponseApiDto{
 			Status: false,
 			Msg:    "Produto não encontrado",

@@ -7,10 +7,10 @@ import (
 
 type IUsuarioRepository interface {
 	GetAll() ([]usuario.UsuarioDto, error)
-	GetByID(id int) (usuario.UsuarioDto, error)
-	GetUsuarioByID(id int) (models.Usuario, error)
+	GetById(id int) (usuario.UsuarioDto, error)
+	GetUsuarioById(id int) (models.Usuario, error)
 
-	Create(product models.Usuario) error
-	Update(product models.Usuario) error
+	Create(usuario models.Usuario) error
+	Update(usuario models.Usuario) error
 	Delete(id int) error
 }

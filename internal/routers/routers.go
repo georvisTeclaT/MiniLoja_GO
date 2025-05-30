@@ -8,7 +8,7 @@ import (
 
 func RegisterRoutes(router *gin.Engine, db *sql.DB) {
 
-	productRoutes(router, db)
+	produtoRoutes(router, db)
 	usuarioRoutes(router, db)
 
 }
