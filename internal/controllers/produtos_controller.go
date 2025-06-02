@@ -10,22 +10,24 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type ProdutosController struct {
-	produtoService interfaces.IProdutoService
+type produtosController struct {
+	_produtoService interfaces.IProdutoService
 }
 
-func NewProdutoController(s interfaces.IProdutoService) *ProdutosController {
-	return &ProdutosController{s}
+func NewProdutoController(produtoService interfaces.IProdutoService) produtosController {
+	return produtosController{
+		_produtoService: produtoService,
+	}
 }
 
-func (p ProdutosController) GetAllProdutos(ctx *gin.Context) {
+func (p produtosController) GetAllProdutos(ctx *gin.Context) {
 
-	produtos := p.produtoService.GetAllProdutos()
+	produtos := p._produtoService.GetAllProdutos()
 
 	ctx.JSON(http.StatusOK, produtos)
 }
 
-func (c ProdutosController) GetProdutoById(ctx *gin.Context) {
+func (c produtosController) GetProdutoById(ctx *gin.Context) {
 
 	idParam := ctx.Param("id")
 
@@ -35,12 +37,12 @@ func (c ProdutosController) GetProdutoById(ctx *gin.Context) {
 		return
 	}
 
-	produto := c.produtoService.GetProdutoById(idProduto)
+	produto := c._produtoService.GetProdutoById(idProduto)
 
 	ctx.JSON(http.StatusOK, produto)
 }
 
-func (p ProdutosController) CreateProduto(ctx *gin.Context) {
+func (p produtosController) CreateProduto(ctx *gin.Context) {
 
 	var input produto.ProdutoAddUpdateDto
 
@@ -65,7 +67,7 @@ func (p ProdutosController) CreateProduto(ctx *gin.Context) {
 		Preco:     input.Preco,
 	}
 
-	retornoAddServices := p.produtoService.CreateProduto(newProduto)
+	retornoAddServices := p._produtoService.CreateProduto(newProduto)
 	if !retornoAddServices.Status {
 		ctx.JSON(http.StatusBadRequest, retornoAddServices)
 		return
@@ -74,7 +76,7 @@ func (p ProdutosController) CreateProduto(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, retornoAddServices)
 }
 
-func (p ProdutosController) UpdateProduto(ctx *gin.Context) {
+func (p produtosController) UpdateProduto(ctx *gin.Context) {
 
 	idParam := ctx.Param("id")
 	idProduto, err := strconv.Atoi(idParam)
@@ -105,7 +107,7 @@ func (p ProdutosController) UpdateProduto(ctx *gin.Context) {
 		Preco:     input.Preco,
 	}
 
-	retornoUpdateServices := p.produtoService.UpdateProduto(idProduto, updateProduto)
+	retornoUpdateServices := p._produtoService.UpdateProduto(idProduto, updateProduto)
 	if !retornoUpdateServices.Status {
 		ctx.JSON(http.StatusBadRequest, retornoUpdateServices)
 		return
@@ -114,7 +116,7 @@ func (p ProdutosController) UpdateProduto(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, retornoUpdateServices)
 }
 
-func (p ProdutosController) DeleteProduto(ctx *gin.Context) {
+func (p produtosController) DeleteProduto(ctx *gin.Context) {
 
 	idParam := ctx.Param("id")
 	idProduto, err := strconv.Atoi(idParam)
@@ -123,7 +125,7 @@ func (p ProdutosController) DeleteProduto(ctx *gin.Context) {
 		return
 	}
 
-	retornoDeleteServices := p.produtoService.DeleteProduto(idProduto)
+	retornoDeleteServices := p._produtoService.DeleteProduto(idProduto)
 	if !retornoDeleteServices.Status {
 		ctx.JSON(http.StatusBadRequest, retornoDeleteServices)
 		return

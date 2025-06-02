@@ -11,8 +11,13 @@ import (
 
 func produtoRoutes(router *gin.Engine, db *sql.DB) {
 
+	// Repositories
 	produtoRepository := repositories.NewProdutoRepository(db)
+
+	// Services
 	produtoService := services.NewProdutoService(produtoRepository)
+
+	// Controller
 	produtoController := controllers.NewProdutoController(produtoService)
 
 	produtoRoutes := router.Group("/produto")

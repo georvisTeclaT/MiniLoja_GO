@@ -10,22 +10,24 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type UsuariosController struct {
-	usuarioService interfaces.IUsuarioService
+type usuariosController struct {
+	_usuarioService interfaces.IUsuarioService
 }
 
-func NewUsuarioController(s interfaces.IUsuarioService) *UsuariosController {
-	return &UsuariosController{s}
+func NewUsuarioController(usuarioService interfaces.IUsuarioService) usuariosController {
+	return usuariosController{
+		_usuarioService: usuarioService,
+	}
 }
 
-func (u UsuariosController) GetAllUsuarios(ctx *gin.Context) {
+func (u usuariosController) GetAllUsuarios(ctx *gin.Context) {
 
-	products := u.usuarioService.GetAllUsuarios()
+	products := u._usuarioService.GetAllUsuarios()
 
 	ctx.JSON(http.StatusOK, products)
 }
 
-func (u UsuariosController) GetUsuarioById(ctx *gin.Context) {
+func (u usuariosController) GetUsuarioById(ctx *gin.Context) {
 
 	idParam := ctx.Param("id")
 
@@ -35,12 +37,12 @@ func (u UsuariosController) GetUsuarioById(ctx *gin.Context) {
 		return
 	}
 
-	usuario := u.usuarioService.GetUsuarioById(idUsuario)
+	usuario := u._usuarioService.GetUsuarioById(idUsuario)
 
 	ctx.JSON(http.StatusOK, usuario)
 }
 
-func (u UsuariosController) CreateUsuario(ctx *gin.Context) {
+func (u usuariosController) CreateUsuario(ctx *gin.Context) {
 
 	var input usuario.UsuarioAddUpdateDto
 
@@ -65,7 +67,7 @@ func (u UsuariosController) CreateUsuario(ctx *gin.Context) {
 		return
 	}
 
-	retornoAddServices := u.usuarioService.CreateUsuario(newUsuario)
+	retornoAddServices := u._usuarioService.CreateUsuario(newUsuario)
 	if !retornoAddServices.Status {
 		ctx.JSON(http.StatusBadRequest, retornoAddServices)
 		return
@@ -74,7 +76,7 @@ func (u UsuariosController) CreateUsuario(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, retornoAddServices)
 }
 
-func (u UsuariosController) UpdateUsuario(ctx *gin.Context) {
+func (u usuariosController) UpdateUsuario(ctx *gin.Context) {
 
 	idParam := ctx.Param("id")
 	idUsuario, err := strconv.Atoi(idParam)
@@ -106,7 +108,7 @@ func (u UsuariosController) UpdateUsuario(ctx *gin.Context) {
 		Ativo:     input.Ativo,
 	}
 
-	retornoUpdateServices := u.usuarioService.UpdateUsuario(idUsuario, updateUsuario)
+	retornoUpdateServices := u._usuarioService.UpdateUsuario(idUsuario, updateUsuario)
 	if !retornoUpdateServices.Status {
 		ctx.JSON(http.StatusBadRequest, retornoUpdateServices)
 		return
@@ -115,7 +117,7 @@ func (u UsuariosController) UpdateUsuario(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, retornoUpdateServices)
 }
 
-func (u UsuariosController) DeleteUsuario(ctx *gin.Context) {
+func (u usuariosController) DeleteUsuario(ctx *gin.Context) {
 
 	idParam := ctx.Param("id")
 	idUsuario, err := strconv.Atoi(idParam)
@@ -124,7 +126,7 @@ func (u UsuariosController) DeleteUsuario(ctx *gin.Context) {
 		return
 	}
 
-	retornoDeleteServices := u.usuarioService.DeleteUsuario(idUsuario)
+	retornoDeleteServices := u._usuarioService.DeleteUsuario(idUsuario)
 	if !retornoDeleteServices.Status {
 		ctx.JSON(http.StatusBadRequest, retornoDeleteServices)
 		return

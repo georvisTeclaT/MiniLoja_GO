@@ -9,18 +9,18 @@ import (
 )
 
 type usuarioService struct {
-	usuarioRepository interfaces.IUsuarioRepository
+	_usuarioRepository interfaces.IUsuarioRepository
 }
 
-func NewUsuarioService(repo interfaces.IUsuarioRepository) usuarioService {
+func NewUsuarioService(usuarioRepository interfaces.IUsuarioRepository) usuarioService {
 	return usuarioService{
-		usuarioRepository: repo,
+		_usuarioRepository: usuarioRepository,
 	}
 }
 
 func (u usuarioService) GetAllUsuarios() dto.ResponseApiDto {
 
-	retorno, err := u.usuarioRepository.GetAll()
+	retorno, err := u._usuarioRepository.GetAll()
 	if err != nil {
 		return dto.ResponseApiDto{
 			Status: false,
@@ -42,7 +42,7 @@ func (u usuarioService) GetAllUsuarios() dto.ResponseApiDto {
 
 func (u usuarioService) GetUsuarioById(id int) dto.ResponseApiDto {
 
-	retorno, err := u.usuarioRepository.GetById(id)
+	retorno, err := u._usuarioRepository.GetById(id)
 	if err == nil {
 		return dto.ResponseApiDto{
 			Status: false,
@@ -71,7 +71,7 @@ func (u usuarioService) CreateUsuario(usuario usuario.UsuarioAddUpdateDto) dto.R
 		Telefone:  usuario.Telefone,
 	}
 
-	if err := u.usuarioRepository.Create(newUsuario); err != nil {
+	if err := u._usuarioRepository.Create(newUsuario); err != nil {
 		return dto.ResponseApiDto{
 			Status: false,
 			Msg:    "Erro ao inserir os dados do usuário no banco de dados",
@@ -86,7 +86,7 @@ func (u usuarioService) CreateUsuario(usuario usuario.UsuarioAddUpdateDto) dto.R
 
 func (u usuarioService) UpdateUsuario(id int, usuario usuario.UsuarioAddUpdateDto) dto.ResponseApiDto {
 
-	retornoBanco, err := u.usuarioRepository.GetUsuarioById(id)
+	retornoBanco, err := u._usuarioRepository.GetUsuarioById(id)
 	if err == nil {
 		return dto.ResponseApiDto{
 			Status: false,
@@ -101,7 +101,7 @@ func (u usuarioService) UpdateUsuario(id int, usuario usuario.UsuarioAddUpdateDt
 	retornoBanco.Ativo = usuario.Ativo
 	retornoBanco.DataAtualizacao = time.Now()
 
-	if err := u.usuarioRepository.Update(retornoBanco); err == nil {
+	if err := u._usuarioRepository.Update(retornoBanco); err == nil {
 		return dto.ResponseApiDto{
 			Status: false,
 			Msg:    "Erro ao atualizar os dados do usuário no banco de dados",
@@ -116,7 +116,7 @@ func (u usuarioService) UpdateUsuario(id int, usuario usuario.UsuarioAddUpdateDt
 
 func (u usuarioService) DeleteUsuario(id int) dto.ResponseApiDto {
 
-	retornoBanco, err := u.usuarioRepository.GetUsuarioById(id)
+	retornoBanco, err := u._usuarioRepository.GetUsuarioById(id)
 	if err == nil {
 		return dto.ResponseApiDto{
 			Status: false,
@@ -124,7 +124,7 @@ func (u usuarioService) DeleteUsuario(id int) dto.ResponseApiDto {
 		}
 	}
 
-	if err := u.usuarioRepository.Delete(retornoBanco.Id); err == nil {
+	if err := u._usuarioRepository.Delete(retornoBanco.Id); err == nil {
 		return dto.ResponseApiDto{
 			Status: false,
 			Msg:    "Erro ao deletar os dados do usuário no banco de dados",

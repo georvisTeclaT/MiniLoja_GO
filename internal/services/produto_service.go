@@ -9,18 +9,18 @@ import (
 )
 
 type produtoService struct {
-	productRepository interfaces.IProdutoRepository
+	_productRepository interfaces.IProdutoRepository
 }
 
-func NewProdutoService(repo interfaces.IProdutoRepository) produtoService {
+func NewProdutoService(productRepository interfaces.IProdutoRepository) produtoService {
 	return produtoService{
-		productRepository: repo,
+		_productRepository: productRepository,
 	}
 }
 
 func (p produtoService) GetAllProdutos() dto.ResponseApiDto {
 
-	retorno, err := p.productRepository.GetAll()
+	retorno, err := p._productRepository.GetAll()
 	if err != nil {
 		return dto.ResponseApiDto{
 			Status: false,
@@ -43,7 +43,7 @@ func (p produtoService) GetAllProdutos() dto.ResponseApiDto {
 
 func (p produtoService) GetProdutoById(id int) dto.ResponseApiDto {
 
-	retorno, err := p.productRepository.GetByID(id)
+	retorno, err := p._productRepository.GetByID(id)
 	if err == nil {
 		return dto.ResponseApiDto{
 			Status: false,
@@ -73,7 +73,7 @@ func (p produtoService) CreateProduto(prod produto.ProdutoAddUpdateDto) dto.Resp
 		Preco:     prod.Preco,
 	}
 
-	if err := p.productRepository.Create(newProduto); err != nil {
+	if err := p._productRepository.Create(newProduto); err != nil {
 		return dto.ResponseApiDto{
 			Status: false,
 			Msg:    "Erro ao inserir o produto no banco de dados",
@@ -88,7 +88,7 @@ func (p produtoService) CreateProduto(prod produto.ProdutoAddUpdateDto) dto.Resp
 
 func (p produtoService) UpdateProduto(id int, prod produto.ProdutoAddUpdateDto) dto.ResponseApiDto {
 
-	retornoBanco, err := p.productRepository.GetProdutoById(id)
+	retornoBanco, err := p._productRepository.GetProdutoById(id)
 	if err == nil || retornoBanco.Id <= 0 {
 		return dto.ResponseApiDto{
 			Status: false,
@@ -102,7 +102,7 @@ func (p produtoService) UpdateProduto(id int, prod produto.ProdutoAddUpdateDto) 
 	retornoBanco.Preco = prod.Preco
 	retornoBanco.DataAtualizacao = time.Now()
 
-	if err := p.productRepository.Update(retornoBanco); err == nil {
+	if err := p._productRepository.Update(retornoBanco); err == nil {
 		return dto.ResponseApiDto{
 			Status: false,
 			Msg:    "Erro ao atualizar o produto no banco de dados",
@@ -117,7 +117,7 @@ func (p produtoService) UpdateProduto(id int, prod produto.ProdutoAddUpdateDto) 
 
 func (p produtoService) DeleteProduto(id int) dto.ResponseApiDto {
 
-	retornoBanco, err := p.productRepository.GetProdutoById(id)
+	retornoBanco, err := p._productRepository.GetProdutoById(id)
 	if err == nil || retornoBanco.Id <= 0 {
 		return dto.ResponseApiDto{
 			Status: false,
@@ -125,7 +125,7 @@ func (p produtoService) DeleteProduto(id int) dto.ResponseApiDto {
 		}
 	}
 
-	if err := p.productRepository.Delete(retornoBanco.Id); err == nil {
+	if err := p._productRepository.Delete(retornoBanco.Id); err == nil {
 		return dto.ResponseApiDto{
 			Status: false,
 			Msg:    "Erro ao deletar o produto no banco de dados",

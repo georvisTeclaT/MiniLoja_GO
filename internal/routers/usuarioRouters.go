@@ -10,8 +10,14 @@ import (
 )
 
 func usuarioRoutes(router *gin.Engine, db *sql.DB) {
+
+	// Repositories
 	usuarioRepository := repositories.NewUsuarioRepository(db)
+
+	// Services
 	usuarioService := services.NewUsuarioService(usuarioRepository)
+
+	// Controller
 	usuariosController := controllers.NewUsuarioController(usuarioService)
 
 	usuarioRoutes := router.Group("/usuario")
