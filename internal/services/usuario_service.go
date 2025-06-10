@@ -6,6 +6,8 @@ import (
 	"mini-loja/internal/models"
 	"mini-loja/internal/repositories/interfaces"
 	"time"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 type usuarioService struct {
@@ -64,11 +66,20 @@ func (u usuarioService) GetUsuarioById(id int) dto.ResponseApiDto {
 
 func (u usuarioService) CreateUsuario(usuario usuario.UsuarioAddUpdateDto) dto.ResponseApiDto {
 
+	_senha, err := HashPassword(usuario.Senha)
+	if err != nil {
+		return dto.ResponseApiDto{
+			Status: false,
+			Msg:    err.Error(),
+		}
+	}
+
 	newUsuario := models.Usuario{
 		Nome:      usuario.Nome,
 		Sobrenome: usuario.Sobrenome,
 		Email:     usuario.Email,
 		Telefone:  usuario.Telefone,
+		Senha:     _senha,
 	}
 
 	if err := u._usuarioRepository.Create(newUsuario); err != nil {
@@ -87,10 +98,18 @@ func (u usuarioService) CreateUsuario(usuario usuario.UsuarioAddUpdateDto) dto.R
 func (u usuarioService) UpdateUsuario(id int, usuario usuario.UsuarioAddUpdateDto) dto.ResponseApiDto {
 
 	retornoBanco, err := u._usuarioRepository.GetUsuarioById(id)
-	if err == nil {
+	if err != nil {
 		return dto.ResponseApiDto{
 			Status: false,
 			Msg:    "Usuário não encontrado",
+		}
+	}
+
+	_senha, err := HashPassword(usuario.Senha)
+	if err != nil {
+		return dto.ResponseApiDto{
+			Status: false,
+			Msg:    err.Error(),
 		}
 	}
 
@@ -100,6 +119,7 @@ func (u usuarioService) UpdateUsuario(id int, usuario usuario.UsuarioAddUpdateDt
 	retornoBanco.Telefone = usuario.Telefone
 	retornoBanco.Ativo = usuario.Ativo
 	retornoBanco.DataAtualizacao = time.Now()
+	retornoBanco.Senha = _senha
 
 	if err := u._usuarioRepository.Update(retornoBanco); err == nil {
 		return dto.ResponseApiDto{
@@ -135,4 +155,11 @@ func (u usuarioService) DeleteUsuario(id int) dto.ResponseApiDto {
 		Status: true,
 		Msg:    "Usuário deletado com sucesso",
 	}
+}
+
+// Uteis
+
+func HashPassword(password string) (string, error) {
+	bytes, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	return string(bytes), err
 }

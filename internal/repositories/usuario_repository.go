@@ -73,7 +73,6 @@ func (u usuarioRepository) GetById(id int) (usuario.UsuarioDto, error) {
 			return usuario, err
 		}
 
-		// Formata a data e coloca no campo string
 		usuario.DataCriacao = dataCriacao.Format("02/01/2006")
 	}
 
@@ -81,7 +80,7 @@ func (u usuarioRepository) GetById(id int) (usuario.UsuarioDto, error) {
 }
 
 func (u usuarioRepository) GetUsuarioById(id int) (models.Usuario, error) {
-	rows, err := u.db.Query("SELECT id, nome, sobrenome, email, telefone, ativo, data_criacao, data_atualizacao FROM usuario WHERE id = $1", id)
+	rows, err := u.db.Query("SELECT id, nome, sobrenome, email, telefone, ativo, data_criacao, data_atualizacao, senha FROM usuario WHERE id = $1", id)
 	if err != nil {
 		return models.Usuario{}, err
 	}
@@ -97,7 +96,35 @@ func (u usuarioRepository) GetUsuarioById(id int) (models.Usuario, error) {
 			&usuario.Telefone,
 			&usuario.Ativo,
 			&usuario.DataCriacao,
-			usuario.DataAtualizacao); err != nil {
+			&usuario.DataAtualizacao,
+			&usuario.Senha); err != nil {
+			return usuario, err
+		}
+		return usuario, nil
+	}
+
+	return usuario, sql.ErrNoRows
+}
+
+func (u usuarioRepository) BuscarUsuarioPorEmail_Senha(dados usuario.UsuarioAutenticarDto) (models.Usuario, error) {
+	rows, err := u.db.Query("SELECT id, nome, sobrenome, email, telefone, ativo, data_criacao, data_atualizacao, senha FROM usuario WHERE email = $1", dados.Email)
+	if err != nil {
+		return models.Usuario{}, err
+	}
+	defer rows.Close()
+
+	var usuario models.Usuario
+	if rows.Next() {
+		if err := rows.Scan(
+			&usuario.Id,
+			&usuario.Nome,
+			&usuario.Sobrenome,
+			&usuario.Email,
+			&usuario.Telefone,
+			&usuario.Ativo,
+			&usuario.DataCriacao,
+			&usuario.DataAtualizacao,
+			&usuario.Senha); err != nil {
 			return usuario, err
 		}
 		return usuario, nil
@@ -112,8 +139,8 @@ func (u usuarioRepository) Create(usuario models.Usuario) error {
 }
 
 func (u usuarioRepository) Update(usuario models.Usuario) error {
-	return u.db.QueryRow("UPDATE usuario SET nome=$1, sobrenome=$2, email=$3, telefone=$4, ativo=$5, data_atualizacao=$6 WHERE id=$7",
-		usuario.Nome, usuario.Sobrenome, usuario.Email, usuario.Telefone, usuario.Ativo, usuario.DataAtualizacao, usuario.Id).Scan(&usuario.Id)
+	return u.db.QueryRow("UPDATE usuario SET nome=$1, sobrenome=$2, email=$3, telefone=$4, ativo=$5, data_atualizacao=$6, senha=$7 WHERE id=$8",
+		usuario.Nome, usuario.Sobrenome, usuario.Email, usuario.Telefone, usuario.Ativo, usuario.DataAtualizacao, usuario.Senha, usuario.Id).Scan(&usuario.Id)
 }
 
 func (u usuarioRepository) Delete(id int) error {

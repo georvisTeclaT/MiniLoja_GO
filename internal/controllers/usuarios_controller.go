@@ -22,9 +22,9 @@ func NewUsuarioController(usuarioService interfaces.IUsuarioService) usuariosCon
 
 func (u usuariosController) GetAllUsuarios(ctx *gin.Context) {
 
-	products := u._usuarioService.GetAllUsuarios()
+	produtos := u._usuarioService.GetAllUsuarios()
 
-	ctx.JSON(http.StatusOK, products)
+	ctx.JSON(http.StatusOK, produtos)
 }
 
 func (u usuariosController) GetUsuarioById(ctx *gin.Context) {
@@ -56,12 +56,22 @@ func (u usuariosController) CreateUsuario(ctx *gin.Context) {
 		Sobrenome: input.Sobrenome,
 		Email:     input.Email,
 		Telefone:  input.Telefone,
+		Senha:     input.Senha,
 	}
 
 	if input.Nome == "" || input.Sobrenome == "" || input.Email == "" || input.Telefone == "" {
 		retorno := dto.ResponseApiDto{
 			Status: false,
 			Msg:    "Objeto inválido",
+		}
+		ctx.JSON(http.StatusBadRequest, retorno)
+		return
+	}
+
+	if len(input.Senha) < 4 || input.Senha == "" {
+		retorno := dto.ResponseApiDto{
+			Status: false,
+			Msg:    "Campo senha inválido",
 		}
 		ctx.JSON(http.StatusBadRequest, retorno)
 		return
@@ -106,6 +116,7 @@ func (u usuariosController) UpdateUsuario(ctx *gin.Context) {
 		Email:     input.Email,
 		Telefone:  input.Telefone,
 		Ativo:     input.Ativo,
+		Senha:     input.Senha,
 	}
 
 	retornoUpdateServices := u._usuarioService.UpdateUsuario(idUsuario, updateUsuario)

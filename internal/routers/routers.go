@@ -11,5 +11,6 @@ func RegisterRoutes(router *gin.Engine, db *sql.DB) {
 	produtoRoutes(router, db)
 	usuarioRoutes(router, db)
 	enderecoRoutes(router, db)
+	autenticadorRoutes(router, db)
 
 }

@@ -9,6 +9,7 @@ type IUsuarioRepository interface {
 	GetAll() ([]usuario.UsuarioDto, error)
 	GetById(id int) (usuario.UsuarioDto, error)
 	GetUsuarioById(id int) (models.Usuario, error)
+	BuscarUsuarioPorEmail_Senha(dados usuario.UsuarioAutenticarDto) (models.Usuario, error)
 
 	Create(usuario models.Usuario) error
 	Update(usuario models.Usuario) error

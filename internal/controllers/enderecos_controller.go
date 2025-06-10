@@ -22,9 +22,9 @@ func NewEnderecoController(enderecoService interfaces.IEnderecoService) endereco
 
 func (e enderecosController) GetAllEnderecos(ctx *gin.Context) {
 
-	products := e._enderecoService.GetAllEnderecos()
+	produtos := e._enderecoService.GetAllEnderecos()
 
-	ctx.JSON(http.StatusOK, products)
+	ctx.JSON(http.StatusOK, produtos)
 }
 
 func (e enderecosController) GetEnderecoById(ctx *gin.Context) {

@@ -11,4 +11,5 @@ type Usuario struct {
 	Ativo           bool      `json:"ativo"`
 	DataCriacao     time.Time `json:"data_criacao"`
 	DataAtualizacao time.Time `json:"data_atualizacao"`
+	Senha           string    `json:"senha"`
 }
